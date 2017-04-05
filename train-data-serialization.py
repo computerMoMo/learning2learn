@@ -16,40 +16,49 @@ def build_data_cv(file_pos, file_neg, cv=10, clean_string=True):
     revs = []
 
     vocab = defaultdict(float)
+    try:
+        with open(file_pos, "rb") as f:
+            for line in f:
+                rev = []
+                rev.append(line.strip())
+                if clean_string:
+                    orig_rev = clean_str(" ".join(rev))
+                else:
+                    orig_rev = " ".join(rev).lower()
+                words = set(orig_rev.split())
+                for word in words:
+                    vocab[word] += 1
+                datum = {"y": 0,
+                         "text": orig_rev,
+                         "num_words": len(orig_rev.split()),
+                         "split": np.random.randint(0, cv)}
+                revs.append(datum)
+    except:
+        revs = []
+        print(file_pos+ " doesn't exist")
+        return revs, vocab
 
-    with open(file_pos, "rb") as f:
-        for line in f:
-            rev = []
-            rev.append(line.strip())
-            if clean_string:
-                orig_rev = clean_str(" ".join(rev))
-            else:
-                orig_rev = " ".join(rev).lower()
-            words = set(orig_rev.split())
-            for word in words:
-                vocab[word] += 1
-            datum = {"y": 0,
-                     "text": orig_rev,
-                     "num_words": len(orig_rev.split()),
-                     "split": np.random.randint(0, cv)}
-            revs.append(datum)
-
-    with open(file_neg, "rb") as f:
-        for line in f:
-            rev = []
-            rev.append(line.strip())
-            if clean_string:
-                orig_rev = clean_str(" ".join(rev))
-            else:
-                orig_rev = " ".join(rev).lower()
-            words = set(orig_rev.split())
-            for word in words:
-                vocab[word] += 1
-            datum = {"y": 1,
-                     "text": orig_rev,
-                     "num_words": len(orig_rev.split()),
-                     "split": np.random.randint(0, cv)}
-            revs.append(datum)
+    try:
+        with open(file_neg, "rb") as f:
+            for line in f:
+                rev = []
+                rev.append(line.strip())
+                if clean_string:
+                    orig_rev = clean_str(" ".join(rev))
+                else:
+                    orig_rev = " ".join(rev).lower()
+                words = set(orig_rev.split())
+                for word in words:
+                    vocab[word] += 1
+                datum = {"y": 1,
+                         "text": orig_rev,
+                         "num_words": len(orig_rev.split()),
+                         "split": np.random.randint(0, cv)}
+                revs.append(datum)
+    except:
+        revs = []
+        print(file_neg + " doesn't exist")
+        return revs, vocab
 
     return revs, vocab
 
@@ -234,14 +243,17 @@ if __name__ == '__main__':
     y_target_text_test = []
     i = 0
     for FileId in TrainFileIdList:
-        revs, vocab = build_data_cv(train_file_path+'pos-'+FileId+'.txt', train_file_path+'neg-'+FileId+'.txt')
         print("FileId:", FileId)
+        revs, vocab = build_data_cv(train_file_path+'pos-'+FileId+'.txt', train_file_path+'neg-'+FileId+'.txt')
+        if len(revs) == 0:
+            continue
         print("load w2v")
         w2v = load_bin_vec(w2v_file, vocab)
         print("generate numpy")
         W, word_idx_map = get_W(w2v)
     #   generate numpy
-        x_target_sent = learn2learn_data_bulid(revs, word_idx_map, word_vector=W, max_text_len=2500, max_sent_len=100, w2vDim=300)
+        x_target_sent = learn2learn_data_bulid(revs, word_idx_map, word_vector=W, max_text_len=2500,
+                                               max_sent_len=100, w2vDim=300)
         if i < 150:
             x_target_text_train.append(x_target_sent)
             y_target_text_train.append(TrainBestRateList[i])
@@ -258,9 +270,9 @@ if __name__ == '__main__':
     np.save('x_train_l2l.npy', x_target_text_train_npy)
     print('x_target_text_train_npy:', x_target_text_train_npy.shape)
     np.save('x_test_l2l.npy', x_target_text_test_npy)
-    print('x_target_text_test_npy:', x_target_text_test_npy)
+    print('x_target_text_test_npy:', x_target_text_test_npy.shape)
 
     np.save('y_train_l2l.npy', y_target_text_train_npy)
     print('y_target_text_train_npy:', y_target_text_train_npy.shape)
     np.save('y_test_l2l.npy', y_target_text_test_npy)
-    print('y_target_text_test_npy', y_target_text_test_npy.shape)
+    print('y_target_text_test_npy:t', y_target_text_test_npy.shape)

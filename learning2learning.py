@@ -20,6 +20,7 @@ from keras.models import load_model
 np.random.seed(1337)
 sysoutfile = open(sys.argv[1], 'w')
 old = sys.stdout
+
 sys.stdout = sysoutfile
 
 

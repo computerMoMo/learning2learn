@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 from keras.models import Sequential
-from keras.layers.core import Dense, Dropout, Reshape, Flatten, Merge
+from keras.layers.core import Dense, Dropout, Reshape, Flatten
 from keras.layers.convolutional import Convolution2D, MaxPooling2D
 from keras.utils import np_utils
 from keras.optimizers import SGD, Adadelta, Adagrad

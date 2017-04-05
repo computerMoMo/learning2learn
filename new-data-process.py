@@ -230,7 +230,8 @@ if __name__ == "__main__":
         data_path = "/opt/exp_data/learning2learn/text-data/train-data/"
         w2v_file = "/opt/exp_data/google_news_vector/GoogleNews-vectors-negative300.bin"
         print("loading data...")
-        revs, vocab = build_data_cv(data_path + "pos-" + id_str + ".txt", data_path + "neg-" + id_str + ".txt", cv=10, clean_string=False)
+        revs, vocab = build_data_cv(data_path + "pos-" + id_str + ".txt", data_path + "neg-" + id_str + ".txt", cv=10,
+                                    clean_string=False)
         max_l = np.max(pd.DataFrame(revs)["num_words"])
         print("data loaded!")
         print("number of sentences: " + str(len(revs)))
